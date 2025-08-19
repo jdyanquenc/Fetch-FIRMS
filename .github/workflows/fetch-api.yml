@@ -19,7 +19,7 @@ jobs:
 
       - name: Commit and push if changed
         run: |
-          git config --global user.email "bot@example.com"
+          git config --global user.email "jdyanquenc@udistrital.edu.co"
           git config --global user.name "Update Bot"
           git add data.json
           git diff --cached --quiet || git commit -m "Update data.json from API"
