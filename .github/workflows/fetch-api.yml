@@ -1,0 +1,26 @@
+name: Fetch external API and update JSON
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"   # every 3 hours
+  workflow_dispatch:        # allow manual trigger too
+
+jobs:
+  fetch-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch API and save JSON
+        run: |
+          curl -sL "https://firms.modaps.eosdis.nasa.gov/mapserver/wfs/South_America/$API_TOKEN/?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAME=ms%3Afires_modis_24hrs&STARTINDEX=0&COUNT=1000&SRSNAME=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A4326&BBOX=-4.5%2C-82.0%2C13.6%2C-66.8%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A4326&outputformat=json" -o data.json
+        env:
+          API_TOKEN: ${{ secrets.FIRMS_API_KEY }}
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.email "bot@example.com"
+          git config --global user.name "Update Bot"
+          git add data.json
+          git diff --cached --quiet || git commit -m "Update data.json from API"
+          git push
